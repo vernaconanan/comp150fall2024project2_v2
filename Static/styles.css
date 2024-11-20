@@ -1,0 +1,89 @@
+/* General Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #faf8ef; /* Light background color */
+}
+
+/* Heading Styles */
+h1 {
+    margin-top: 20px;
+    color: #776e65; /* Dark brown color for the heading */
+}
+
+/* Container for the game board */
+.game-container {
+    position: relative;
+    width: 500px;
+    margin: 0 auto;
+}
+
+/* Grid Container (Game Board) */
+.grid-container {
+    width: 400px;
+    height: 400px;
+    background-color: #bbada0;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Grid Cell (Each individual cell) */
+.grid-cell {
+    width: 110px;
+    height: 110px;
+    margin: 10px;
+    background-color: #cdc1b4;
+    border-radius: 5px;
+    position: relative;
+}
+
+/* Tile (The moving number with images) */
+.tile {
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    background-color: #eee4da;  /* Default tile background color */
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #776e65; /* Tile text color */
+    background-size: cover;
+    background-position: center;
+}
+
+/* Tile Image Styles */
+.tile img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+/* Score Container */
+.score-container {
+    margin-top: 20px;
+    color: #776e65; /* Dark brown color for score */
+    font-size: 24px;
+}
+
+/* New Game Button */
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}

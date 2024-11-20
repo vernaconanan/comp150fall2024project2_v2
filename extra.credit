@@ -1,0 +1,361 @@
+### 50pts EC: Add a database backend to your project separate from your backend server.
+## Step 2: Create the User Model (User.js)
+## In the models folder, create a User.js model to define the schema for storing user credentials:
+// backend/models/User.js
+const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+});
+
+const User = mongoose.model('User', UserSchema);
+module.exports = User;
+
+##Step 3: Create Authentication Routes (auth.js)
+In the routes folder, create an auth.js file to handle login, registration, and authentication:
+// backend/routes/auth.js
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const router = express.Router();
+
+// Register a new user
+router.post('/register', async (req, res) => {
+    const { username, password } = req.body;
+    
+    try {
+        const existingUser = await User.findOne({ username });
+        if (existingUser) return res.status(400).json({ message: 'Username already taken' });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({ username, password: hashedPassword });
+        await newUser.save();
+
+        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(201).json({ message: 'User registered', token });
+    } catch (err) {
+        res.status(500).json({ message: 'Error registering user' });
+    }
+});
+
+// Login an existing user
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    
+    try {
+        const user = await User.findOne({ username });
+        if (!user) return res.status(400).json({ message: 'User not found' });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: 'Invalid password' });
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(200).json({ message: 'Login successful', token });
+    } catch (err) {
+        res.status(500).json({ message: 'Error logging in' });
+    }
+});
+
+module.exports = router;
+
+## Step 4: Environment Variables (.env)
+In the backend folder, create a .env file to store sensitive data like the database connection URL and JWT secret:
+MONGODB_URI=mongodb://localhost:27017/animal2048
+JWT_SECRET=mysecretkey
+Make sure to replace mysecretkey with a more secure secret, and adjust the MONGODB_URI based on your setup (e.g., if you're using MongoDB Atlas, use the connection string from there).
+
+## 3. Connect the Frontend to the Backend
+Step 1: Update Frontend (game.js)
+In the frontend folder, you'll need to make requests to the backend to log in and register users. Here's an example of how you might handle user login and registration:
+// frontend/game.js
+
+// Function to handle login
+async function loginUser(username, password) {
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('authToken', data.token); // Store JWT token in localStorage
+            alert('Login successful!');
+            window.location.reload(); // Redirect or reload the game
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        console.error('Error logging in:', err);
+    }
+}
+
+// Function to handle registration
+async function registerUser(username, password) {
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Registration successful! You can now log in.');
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        console.error('Error registering user:', err);
+    }
+}
+
+## Step 2: Add Login/Registration UI
+In your HTML, add forms for the user to log in or register:
+<!-- frontend/index.html -->
+<div id="auth-container">
+    <h2>Login</h2>
+    <form id="login-form">
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+    </form>
+
+    <h2>Register</h2>
+    <form id="register-form">
+        <input type="text" id="reg-username" placeholder="Username" required />
+        <input type="password" id="reg-password" placeholder="Password" required />
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        loginUser(username, password);
+    });
+
+    document.getElementById('register-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const username = document.getElementById('reg-username').value;
+        const password = document.getElementById('reg-password').value;
+        registerUser(username, password);
+    });
+</script>
+
+## 4. Running the App
+Start MongoDB (locally or use MongoDB Atlas).
+**Start
+
+### 50pts EC: Add sounds to your project (not just background music).
+### 1. Collect Sound Files
+First, you need sound files for various actions. You can either create or download sound effects. Here are some examples of sounds you might need:
+
+Move Sound: A soft sliding sound when tiles move.
+Merge Sound: A merging sound when two tiles with the same animal combine.
+Win Sound: A celebratory sound when the player wins the game.
+Game Over Sound: A failure sound when the game ends.
+
+## Save these sound files in a folder, such as sounds/, and name them appropriately. For example:
+
+move.wav
+merge.wav
+win.wav
+gameover.wav
+
+### 2. Modify the Frontend to Handle Sounds
+In your game.js file (the frontend JavaScript), you'll add functions to play the corresponding sound for each action (move, merge, etc.).
+
+## Step 1: Load the Sounds
+You can load sound files by creating new Audio objects for each sound.
+// frontend/game.js
+
+// Load sound files
+const moveSound = new Audio('sounds/move.wav');
+const mergeSound = new Audio('sounds/merge.wav');
+const winSound = new Audio('sounds/win.wav');
+const gameOverSound = new Audio('sounds/gameover.wav');
+
+// Optional: Add volume control or other adjustments
+moveSound.volume = 0.5;
+mergeSound.volume = 0.7;
+winSound.volume = 1.0;
+gameOverSound.volume = 1.0;
+
+// Function to play sound
+function playSound(sound) {
+    sound.play();
+}
+
+## Step 2: Trigger Sounds on Specific Events
+Now, you need to call these sound functions when certain actions occur. For example:
+
+When a tile moves (you'll need to call this after the tile move is completed).
+When tiles merge (call this after the merge logic).
+When the game is won or lost (call these when the conditions for winning or losing are met).
+Example: Integrating Sounds with Tile Movement and Merging
+Let's integrate the sounds into the tile movement and merging logic. I'll show you how to update the move and merge functions to play sounds.
+
+## 1. Play Sound When a Tile Moves
+In your move logic (e.g., moveUp, moveDown, moveLeft, moveRight), you can call the playSound function to play a "move" sound whenever tiles actually move.
+// Move Up Function with Sound
+function moveUp() {
+    let moved = false;
+    for (let col = 0; col < gridSize; col++) {
+        let stack = [];
+        for (let row = 0; row < gridSize; row++) {
+            if (grid[row][col]) {
+                stack.push(grid[row][col]);
+                grid[row][col] = null;
+            }
+        }
+
+        // Merge tiles in stack
+        for (let i = 0; i < stack.length - 1; i++) {
+            if (stack[i] === stack[i + 1]) {
+                stack[i] = null; // Merge
+                score += 10; // Update score
+                stack.splice(i + 1, 1); // Remove merged tile
+                playSound(mergeSound); // Play merge sound
+            }
+        }
+
+        // Place tiles back in the grid
+        for (let row = 0; row < gridSize; row++) {
+            if (stack[row]) {
+                grid[row][col] = stack[row];
+                moved = true;
+            }
+        }
+    }
+
+    if (moved) {
+        playSound(moveSound); // Play move sound when a tile moves
+    }
+
+    updateScore();
+    return moved;
+}
+
+## 2. Play Sound When Tiles Merge
+In the merging part of the game, you should already have the logic where two tiles merge (i.e., they have the same animal and combine). You can add a call to playSound(mergeSound) at this point.
+
+The code above already includes a playSound(mergeSound) call within the merging logic.
+
+## 3. Play Sound on Winning the Game
+When the player reaches the goal (e.g., they merge tiles to reach a certain number or animal), you can trigger the "win" sound.
+function checkWin() {
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            if (grid[row][col] === 'someWinningCondition') {  // Replace with actual condition
+                playSound(winSound); // Play win sound
+                alert('You Win!');
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+## 4. Play Sound on Game Over
+When the game ends, you can play a "game over" sound. You could call this when the board is full and no moves are possible, which you've already implemented with checkGameOver().
+function checkGameOver() {
+    // Check for empty cells or possible merges
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            if (grid[row][col] === null) {
+                return false;
+            }
+            // Check adjacent cells for possible merges
+            if (row < gridSize - 1 && grid[row][col] === grid[row + 1][col]) return false;
+            if (col < gridSize - 1 && grid[row][col] === grid[row][col + 1]) return false;
+        }
+    }
+    playSound(gameOverSound); // Play game over sound
+    alert('Game Over!');
+    return true;
+}
+
+### 3. Final Code Example: Integrating Sound with Moves and Merges
+Here's an integrated example of the tile move and merge logic with sounds.
+// Load sound files
+const moveSound = new Audio('sounds/move.wav');
+const mergeSound = new Audio('sounds/merge.wav');
+const winSound = new Audio('sounds/win.wav');
+const gameOverSound = new Audio('sounds/gameover.wav');
+
+// Optional: Adjust volumes
+moveSound.volume = 0.5;
+mergeSound.volume = 0.7;
+winSound.volume = 1.0;
+gameOverSound.volume = 1.0;
+
+// Function to play sound
+function playSound(sound) {
+    sound.play();
+}
+
+// Move Up Function with Sound
+function moveUp() {
+    let moved = false;
+    for (let col = 0; col < gridSize; col++) {
+        let stack = [];
+        for (let row = 0; row < gridSize; row++) {
+            if (grid[row][col]) {
+                stack.push(grid[row][col]);
+                grid[row][col] = null;
+            }
+        }
+
+        // Merge tiles in stack
+        for (let i = 0; i < stack.length - 1; i++) {
+            if (stack[i] === stack[i + 1]) {
+                stack[i] = null; // Merge
+                score += 10; // Update score
+                stack.splice(i + 1, 1); // Remove merged tile
+                playSound(mergeSound); // Play merge sound
+            }
+        }
+
+        // Place tiles back in the grid
+        for (let row = 0; row < gridSize; row++) {
+            if (stack[row]) {
+                grid[row][col] = stack[row];
+                moved = true;
+            }
+        }
+    }
+
+    if (moved) {
+        playSound(moveSound); // Play move sound when a tile moves
+    }
+
+    updateScore();
+    return moved;
+}
+
+// Game Over check with sound
+function checkGameOver() {
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            if (grid[row][col] === null) {
+                return false;
+            }
+            if (row < gridSize - 1 && grid[row][col] === grid[row + 1][col]) return false;
+            if (col < gridSize - 1 && grid[row][col] === grid[row][col + 1]) return false;
+        }
+    }
+    playSound(gameOverSound); // Play game over sound
+    alert('Game Over!');
+    return true;
+}
+
+
