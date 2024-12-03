@@ -1,27 +1,300 @@
+/* Base styling for the page */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #87ceeb, #32cd32); /* Sky to grass gradient */
+}
+
+/* Header container for the title and score */
+#header-container {
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    background-color: #ffffffcc; /* Light background with slight transparency */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: sticky; /* Keeps it at the top when scrolling */
+    top: 0;
+    z-index: 10; /* Ensure it stays above other elements */
+}
+
+/* Styling for the game title */
+h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    color: #333;
+}
+
+/* Styling for the score */
+#score-container {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    color: #444;
+}
+
+/* Center container for the game grid */
+.center-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px; /* Adds space around the game content */
+    background-color: #ffffffcc; /* Light background with slight transparency */
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for the game grid */
 .grid-container {
-    width: 400px; /* Total grid width */
-    height: 400px; /* Total grid height */
-    background-image: url('/static/images/board-background.jpg'); /* Use your reference image */
-    background-size: cover; /* Scale the background to fit */
-    background-position: center; /* Center the background */
+    width: 500px; /* Total grid width */
+    height: 500px; /* Total grid height */
     display: grid; /* Use CSS Grid for layout */
     grid-template-columns: repeat(4, 1fr); /* Create a 4x4 grid */
     grid-template-rows: repeat(4, 1fr);
-    gap: 0; /* Remove gaps between grid cells */
-    padding: 0;
+    gap: 5px; /* Adds some spacing between grid cells */
+    padding: 10px; /* Inner padding around the grid */
+    background-color: #ccc; /* Light gray background for the grid container */
+    border-radius: 10px; /* Rounded corners for the grid container */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
+    margin-top: 20px; /* Space between the header and the grid */
 }
 
+/* Styling for individual grid cells */
 .grid-cell {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%; /* Fill grid cell */
     height: 100%;
+    background-color: #eee; /* Light gray background for cells */
+    border-radius: 5px; /* Rounded corners for grid cells */
+    transition: transform 0.2s ease-in-out; /* Smooth slide transition */
 }
 
+/* Add glow effect for high-value tiles */
+.tile-high-value {
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    }
+}
+
+/* Styling for images inside grid cells */
 .grid-cell img {
     width: 90%; /* Scale the image slightly smaller than the cell */
     height: 90%;
     object-fit: contain; /* Ensure the image fits without distortion */
     border-radius: 5px; /* Optional: Rounded corners */
+}
+
+/* Styling for the restart button */
+#restart-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+#restart-button:hover {
+    background-color: #e64a19;
+}
+
+/* Add the Game Over overlay styles */
+#game-over {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Transparent black overlay */
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Ensure it appears on top */
+    display: flex; /* Flexbox centering */
+    flex-direction: column; /* Stack the text and button */
+}
+
+/* Styling for buttons inside the Game Over overlay */
+#game-over button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+#game-over button:hover {
+    background-color: #e64a19;
+}
+
+/* Score animation */
+#score {
+    font-size: 2rem;
+    color: #444;
+    transition: transform 0.5s ease-in-out, color 0.3s ease-in-out;
+}
+
+#score-updated {
+    transform: scale(1.2);
+    color: #ff5722; /* Highlight score color */
+}
+
+/* Exploding Tiles Animation */
+@keyframes explode {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(2) rotate(90deg);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(0) rotate(180deg);
+        opacity: 0;
+    }
+}
+
+/* Apply the explode animation to grid cells when game is over */
+.explode {
+    animation: explode 0.5s ease-out forwards;
+    position: absolute;
+}
+/* New "You Win!" screen and celebratory animations */
+#game-win {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Transparent black overlay */
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    z-index: 20; /* Ensure it appears above other elements */
+    display: flex; /* Flexbox centering */
+    flex-direction: column; /* Stack the text and button */
+    animation: fadeIn 1s ease-in-out; /* Smooth fade-in animation */
+}
+
+/* Animating the celebratory text */
+#game-win h1 {
+    font-size: 4rem;
+    animation: glowText 1s infinite alternate, popUp 1s ease-out;
+    color: #ffcc00; /* Bright celebratory color */
+}
+
+@keyframes glowText {
+    0% {
+        text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00;
+    }
+    100% {
+        text-shadow: 0 0 20px #ffcc00, 0 0 30px #ffcc00, 0 0 40px #ffcc00;
+    }
+}
+
+@keyframes popUp {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Confetti animation */
+@keyframes confetti {
+    0% {
+        transform: rotate(0deg) translateY(-100vh);
+    }
+    100% {
+        transform: rotate(360deg) translateY(100vh);
+    }
+}
+
+.confetti {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background-color: #ffcc00;
+    opacity: 0;
+    animation: confetti 2s infinite;
+}
+
+.confetti:nth-child(odd) {
+    background-color: #ff5722;
+    animation-delay: 0.5s;
+}
+
+.confetti:nth-child(even) {
+    background-color: #2196F3;
+    animation-delay: 1s;
+}
+/* Hint container for showing dynamic game hints */
+#hint-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 1.5rem;
+    padding: 20px;
+    border-radius: 10px;
+    display: none; /* Hidden by default */
+    z-index: 10; /* Ensure it appears above other elements */
+}
+
+.hidden {
+    display: none; /* Use this to hide the hint container */
+}
+
+/* If you'd like the hint to fade in/out */
+#hint-container.show {
+    display: block;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }

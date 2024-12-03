@@ -3,4 +3,10 @@ name = "repl-nix-comp150fall2024project2"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "flask-login>=0.6.3",
+    "flask-sqlalchemy>=3.1.1",
+    "flask>=3.1.0",
+    "requests>=2.32.3",
+    "werkzeug>=3.1.3",
+]

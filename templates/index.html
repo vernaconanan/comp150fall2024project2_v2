@@ -7,16 +7,46 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-<h1>2048 Animal Game</h1>
-<div id="score-container">
-    <p>Score: <span id="score">0</span></p>
-</div>
-<div id="game-board" class="grid-container"></div>
+    <div id="header-container">
+        <h1>2048 Animal Game</h1>
+        <div id="score-container">
+            <p>Score: <span id="score">0</span></p>
+            <p>Best Score: <span id="best-score">0</span></p>
+        </div>
+    </div>
 
-<script>
-    // Make `animalMap` available as a global JavaScript variable
-    const animalMap = {{ animal_map | tojson }};
-</script>
-<script src="/static/script.js"></script>
+    <!-- Game Board (grid) -->
+    <div id="game-board" class="grid-container"></div>
+
+    <!-- Game Over Overlay (hidden by default) -->
+    <div id="game-over" style="display:none;">
+        <p>Game Over!</p>
+        <button id="close-game-over">Close</button>
+        <button id="restart-from-gameover">Restart</button>
+    </div>
+
+    <!-- Winning Overlay (hidden by default) -->
+    <div id="game-won" style="display:none;">
+        <p>You Win!</p>
+        <button id="close-game-won">Close</button>
+        <button id="restart-from-gamewon">Restart</button>
+    </div>
+
+    <!-- Hint Container -->
+    <div id="hint-container" class="hidden">
+        <p id="hint-message"></p>
+    </div>
+
+    <button id="restart-button">Restart Game</button>
+
+    <!-- Audio Elements -->
+    <audio id="mergeSound" src="/static/sounds/merge.wav.mp3" preload="auto"></audio>
+    <audio id="gameOverSound" src="/static/sounds/game_overr.wav.mp3" preload="auto"></audio>
+    <audio id="newGameSound" src="/static/sounds/new_gamee.wav.mp3" preload="auto"></audio>
+
+    <script>
+        const animalMap = {{ animal_map | tojson }};
+    </script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
